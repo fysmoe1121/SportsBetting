@@ -40,7 +40,8 @@ if new_players:
             new_players.discard(player['id'])
 
 for projection in cs_projections:
-    projection['player'] = cs_players[projection['player_id']]
+    projection['player_name'] = cs_players[projection['player_id']]['name']
+    projection['player_team'] = cs_players[projection['player_id']]['team']
     print(projection, "\n")
 
 
