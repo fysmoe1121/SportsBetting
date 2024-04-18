@@ -7,27 +7,44 @@ with open(file_path, 'r') as file:
     json_data = file.read()
 
 data = jsonpickle.decode(json_data)
-projections = data['data']
-players = data['included']
+all_projections = data['data']
+all_players = data['included']
 
 cs_projections = []
 cs_players = {}
+new_players = set()
 
-for item in projections:
-    if item['relationships']['league']['data']['id'] == "265":
-        simplified_item = {
-            "stat_type": item["attributes"]["stat_type"],
-            "line_score": item["attributes"]["line_score"],
-            "player_id": item["relationships"]["new_player"]["data"]["id"]
+for projection in all_projections:
+    if projection['relationships']['league']['data']['id'] == "265":
+        simplified_projection = {
+            "stat_type": projection["attributes"]["stat_type"],
+            "line_score": projection["attributes"]["line_score"],
+            "player_id": projection["relationships"]["new_player"]["data"]["id"]
         }
 
-        cs_projections.append(simplified_item)
-        cs_players[item['relationships']['new_player']['data']['id']] = None
+        if not simplified_projection["player_id"] in cs_players:
+            new_players.add(simplified_projection["player_id"])
 
-for item in players:
-    if item['id'] in cs_players:
-        cs_players[item['id']] = item
-      
-print(cs_projections)
+        cs_projections.append(simplified_projection)
 
+if new_players:
+    for player in all_players:
+        if player['id'] in new_players:
+            simplified_player = {
+                'name': player["attributes"]['name'],
+                'team': player["attributes"]['team']
+            }
+
+            cs_players[player['id']] = simplified_player
+            new_players.discard(player['id'])
+
+for projection in cs_projections:
+    projection['player'] = cs_players[projection['player_id']]
+    print(projection, "\n")
+
+
+
+#print(cs_projections)
+#print(cs_players)
+#print(new_players)
     
