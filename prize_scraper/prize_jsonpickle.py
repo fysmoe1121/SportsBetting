@@ -19,6 +19,7 @@ for projection in all_projections:
         simplified_projection = {
             "stat_type": projection["attributes"]["stat_type"],
             "line_score": projection["attributes"]["line_score"],
+            "opposing_team": projection["attributes"]["description"],
             "player_id": projection["relationships"]["new_player"]["data"]["id"]
         }
 
